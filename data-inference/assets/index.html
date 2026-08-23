@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoFlow Control Panel</title>
+  <style>
+    :root { 
+      /* Updated to a light, open eco-friendly color scheme */
+      --bg: #f2f7f4; 
+      --card: #ffffff; 
+      --accent: #059669; 
+      --text: #1f2937; 
+      --text-muted: #4b5563;
+    }
+    body { 
+      font-family: system-ui, sans-serif; 
+      background: var(--bg); 
+      color: var(--text); 
+      margin: 0; 
+      padding: 2rem 1rem; 
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #065f46;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card { 
+      background: var(--card); /* Default white background for top cards */
+      padding: 1.5rem; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+      border: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    /* Soil Health card background & grid position */
+    .soil-card {
+      grid-column: 2 / 3;
+      background: #cef2d9; /* Light Mint Green */
+      border-color: #bbf7d0;
+    }
+
+    /* Pump State card background & grid position */
+    .pump-card {
+      grid-column: 2 / 3;
+      background: #dfdefa; /* Light Warm Amber */
+      border-color: #cfe2f3;
+    }
+
+    /* Manual Override spans full width or sits at bottom */
+    .override-card {
+      grid-column: 1 / -1;
+      max-width: 400px;
+      justify-self: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .status-val { 
+      font-size: 2rem; 
+      font-weight: bold; 
+      color: var(--accent); 
+      margin-top: 0.5rem; 
+    }
+
+    /* Responsive adjustment for small screens */
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      .soil-card, .pump-card, .override-card {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>EcoFlow AI Dashboard</h1>
+  <div class="dashboard">
+    <!-- Top Row: Temperature, Humidity, Moisture -->
+    <div class="card">
+      <h3>Temperature</h3>
+      <div id="temp" class="status-val">--%</div>
+    </div>
+    <div class="card">
+      <h3>Humidity</h3>
+      <div id="humid" class="status-val">--%</div>
+    </div>
+    <div class="card">
+      <h3>Moisture</h3>
+      <div id="moist" class="status-val">--%</div>
+    </div>
+
+    <!-- Middle Row (Centered): Soil Health -->
+    <div class="card soil-card">
+      <h3>Soil Health / AI Status</h3>
+      <div id="prediction" class="status-val">Analyzing...</div>
+    </div>
+
+        <!-- Middle Row (Centered): Pump state -->
+    <div class="card pump-card">
+      <h3>Pump State</h3>
+      <div id="pump_state" class="status-val">...</div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://192.168.2.9:7000';
+
+    async function update() {
+      try {
+        const response = await fetch(`${API_BASE}/api/status`, {
+          signal: AbortSignal.timeout(1500)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+  
+        const data = await response.json();
+  
+        if (data.temp !== undefined) {
+          document.getElementById('temp').innerText = `${data.temp}%`;
+        }
+        if (data.humid !== undefined) {
+          document.getElementById('humid').innerText = `${data.humid}%`;
+        }
+        if (data.moist !== undefined) {
+          document.getElementById('moist').innerText = `${data.moist}%`;
+        }
+        if (data.prediction) {
+          document.getElementById('prediction').innerText = data.prediction;
+        }
+        if (data.pump_state) {
+          document.getElementById('pump_state').innerText = data.pump_state;
+        }
+      } catch (err) {
+        console.error('Fetch failed:', err);
+        document.getElementById('prediction').innerText = 'Offline';
+      }
+    }
+    
+    setInterval(update, 5000);
+    update();
+  </script>
+</body>
+</html>

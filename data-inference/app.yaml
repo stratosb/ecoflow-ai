@@ -1,0 +1,6 @@
+name: data-inference
+description: ""
+ports: []
+bricks:
+  - arduino:web_ui: {}
+icon: 😀
