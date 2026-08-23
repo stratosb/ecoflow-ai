@@ -11,7 +11,7 @@ const int dryValue = 711;
 const int wetValue = 296;
 
 unsigned long previousMillis = 0; 	// Stores last time values were updated
-const long interval = 5000; 		// Every 10 seconds
+const long interval = 5000; 		// Every 5 seconds
 int count;
 
 

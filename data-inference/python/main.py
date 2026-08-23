@@ -7,11 +7,7 @@ from arduino.app_bricks.web_ui import WebUI
 
 model_path = "/app/assets/time-series-sensor.eim"
 
-# Grant execute permissions (+x) to the file dynamically
-#os.chmod(model_path, os.stat(model_path).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
-
 # Initialize the Edge Impulse runner with your .eim model file
-# model_path = "/home/arduino/ArduinoApps/time-series-sensor/assets/time-series-sensor.eim"
 runner = ImpulseRunner(model_path)
 
 # Verify model details
